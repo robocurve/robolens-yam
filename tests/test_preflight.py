@@ -5,9 +5,9 @@ from __future__ import annotations
 import json
 
 import pytest
-from robolens.compat import CompatibilityReport, CompatIssue
-from robolens.policy import PolicyConfig, PolicyInfo
-from robolens.spaces import ActionSemantics, Box
+from roboinspect.compat import CompatibilityReport, CompatIssue
+from roboinspect.policy import PolicyConfig, PolicyInfo
+from roboinspect.spaces import ActionSemantics, Box
 
 from robolens_yam import preflight
 from robolens_yam.embodiment import YAMEmbodiment

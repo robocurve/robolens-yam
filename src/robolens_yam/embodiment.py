@@ -1,9 +1,9 @@
-"""``YAMEmbodiment`` — RoboLens embodiment for I2RT YAM bimanual arms.
+"""``YAMEmbodiment`` — RoboInspect embodiment for I2RT YAM bimanual arms.
 
 Wraps the i2rt joint-position driver. Designed for real-robot reality:
 
 * **Safety backstop** — every command is clamped to the configured joint limits
-  inside :meth:`step`, *independently* of any RoboLens ``Approver`` (so unclamped
+  inside :meth:`step`, *independently* of any RoboInspect ``Approver`` (so unclamped
   model outputs can never reach the motors).
 * **Operator-in-the-loop success** — there is no privileged oracle; when the
   operator signals end-of-episode the embodiment returns
@@ -26,9 +26,9 @@ from typing import Any, Protocol, runtime_checkable
 
 import numpy as np
 import numpy.typing as npt
-from robolens.embodiment import SELF_PACED, EmbodimentInfo
-from robolens.scene import Scene
-from robolens.types import Action, Observation, StepResult
+from roboinspect.embodiment import SELF_PACED, EmbodimentInfo
+from roboinspect.scene import Scene
+from roboinspect.types import Action, Observation, StepResult
 
 from robolens_yam import packing
 from robolens_yam.config import DEFAULT_CAMERAS, YamConfig, action_box, observation_space
@@ -84,7 +84,7 @@ def _default_camera_reader(cfg: YamConfig) -> ImageMap:
 
 
 class YAMEmbodiment:
-    """RoboLens embodiment for bimanual YAM arms (joint-position control)."""
+    """RoboInspect embodiment for bimanual YAM arms (joint-position control)."""
 
     def __init__(
         self,

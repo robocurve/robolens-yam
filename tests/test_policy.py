@@ -6,8 +6,8 @@ from typing import Any
 
 import numpy as np
 import pytest
-from robolens.scene import Scene
-from robolens.types import Observation
+from roboinspect.scene import Scene
+from roboinspect.types import Observation
 
 from robolens_yam import packing
 from robolens_yam.config import MolmoActConfig

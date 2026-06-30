@@ -2,20 +2,20 @@
 
 # 🦾 robolens-yam
 
-**Run [RoboLens](https://github.com/robocurve/robolens) evals on real
+**Run [RoboInspect](https://github.com/robocurve/roboinspect) evals on real
 [I2RT YAM](https://i2rt.com/products/yam-6-dof-arm) bimanual arms driven by
 [MolmoAct2](https://github.com/allenai/molmoact2).**
 
 [![CI](https://github.com/robocurve/robolens-yam/actions/workflows/ci.yml/badge.svg)](https://github.com/robocurve/robolens-yam/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/robocurve/robolens-yam/actions/workflows/ci.yml)
-[![Built on RoboLens](https://img.shields.io/badge/built%20on-RoboLens-indigo)](https://github.com/robocurve/robolens)
+[![Built on RoboInspect](https://img.shields.io/badge/built%20on-RoboInspect-indigo)](https://github.com/robocurve/roboinspect)
 
 </div>
 
-RoboLens has **two** swappable inputs: a `Policy` (the VLA brain) and an
+RoboInspect has **two** swappable inputs: a `Policy` (the VLA brain) and an
 `Embodiment` (the robot body + world). This package provides both for the
-YAM + MolmoAct2 stack, so any embodiment-agnostic RoboLens task — e.g. all of
+YAM + MolmoAct2 stack, so any embodiment-agnostic RoboInspect task — e.g. all of
 [KitchenBench](https://github.com/robocurve/kitchenbench) — runs on real arms:
 
 - **`molmoact2` policy** — a thin client for MolmoAct2's first-party bimanual-YAM
@@ -24,18 +24,18 @@ YAM + MolmoAct2 stack, so any embodiment-agnostic RoboLens task — e.g. all of
   clamp, operator-in-the-loop success, and self-paced control.
 
 Both declare the **same 14-D joint-position contract** (2 arms × [6 joints +
-gripper], cameras `top/left/right`, packed `joint_pos` state), so RoboLens's
+gripper], cameras `top/left/right`, packed `joint_pos` state), so RoboInspect's
 compatibility check passes with **zero errors and zero warnings** — verifiable
 before any motion.
 
 ```bash
-robolens run --task kitchenbench/pour_pasta --policy molmoact2 --embodiment yam_arms
+roboinspect run --task kitchenbench/pour_pasta --policy molmoact2 --embodiment yam_arms
 ```
 
 ## Install (on the robot/GPU machine)
 
 ```bash
-# RoboLens isn't on PyPI yet; uv resolves it (and the optional i2rt driver) from git.
+# RoboInspect isn't on PyPI yet; uv resolves it (and the optional i2rt driver) from git.
 uv pip install "robolens-yam[client,yam] @ git+https://github.com/robocurve/robolens-yam"
 ```
 
@@ -68,8 +68,8 @@ You must provide a `camera_reader` (there is no universal camera API) returning
 `{"top_cam", "left_cam", "right_cam": HxWx3 uint8}`. From Python:
 
 ```python
-from robolens import eval
-from robolens.approver import ClampApprover
+from roboinspect import eval
+from roboinspect.approver import ClampApprover
 from robolens_yam import MolmoAct2Policy, YAMEmbodiment, YamConfig
 
 emb = YAMEmbodiment(YamConfig(left_channel="can0", right_channel="can1"),
@@ -88,14 +88,14 @@ Unattended runs simply run to `max_steps` and score as failures.
 ## Safety
 
 - **Hard clamp backstop.** Every command is clipped to `YamConfig.joint_low/high`
-  *inside* `step()`, independent of any RoboLens `Approver` — unclamped model
+  *inside* `step()`, independent of any RoboInspect `Approver` — unclamped model
   outputs can never reach the motors. **Set these to your real YAM joint limits**
   (the defaults are conservative placeholders: joints ±π, gripper 0–1).
 - **Use `ClampApprover`** on hardware for a second layer.
 - **Absolute vs. delta joints — verify first.** MolmoAct2's YAM `actions` are
   treated as **absolute** joint targets by default. If your checkpoint emits
   deltas, set `YamConfig(joints_are_delta=True)` (the embodiment converts to
-  absolute internally so the declared `joint_pos` stays honest). RoboLens's
+  absolute internally so the declared `joint_pos` stays honest). RoboInspect's
   compat check *cannot* tell these apart — confirm with `--dry-run` and a single
   slow jog before running a task.
 - **Gripper calibration.** Map MolmoAct2's normalized gripper to your hardware via
@@ -110,12 +110,12 @@ Unattended runs simply run to `max_steps` and score as failures.
 `camera_order`, `state_key`, `cam_height/width`.
 
 Scalar knobs are settable from the CLI:
-`robolens run -P server_url=http://gpu:8202 -E left_channel=can0 ...`.
+`roboinspect run -P server_url=http://gpu:8202 -E left_channel=can0 ...`.
 
 ## Development
 
 ```bash
-uv venv && uv pip install -e ".[dev]"     # robolens + kitchenbench from git tags
+uv venv && uv pip install -e ".[dev]"     # roboinspect + kitchenbench from git tags
 uv run pre-commit install
 uv run pytest --cov                        # 100% coverage required
 uv run ruff check . && uv run mypy

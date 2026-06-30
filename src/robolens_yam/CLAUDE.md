@@ -1,6 +1,6 @@
 # `robolens_yam` package — module map
 
-Two RoboLens components + the glue to make them an honest, testable, safe pair.
+Two RoboInspect components + the glue to make them an honest, testable, safe pair.
 The package is `mypy --strict` clean, ships `py.typed`, and is 100%-covered.
 
 ## Modules

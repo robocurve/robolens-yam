@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import numpy as np
 import numpy.typing as npt
-from robolens.spaces import StateField, StateSpec
+from roboinspect.spaces import StateField, StateSpec
 
 ARM_DOF = 6  # revolute joints per arm
 GRIPPER_DOF = 1  # one linear gripper per arm

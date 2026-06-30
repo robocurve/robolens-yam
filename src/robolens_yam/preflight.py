@@ -1,7 +1,7 @@
 """Preflight: prove a YAM + MolmoAct2 pairing is compatible *before any motion*.
 
 ``robolens-yam-preflight`` constructs the policy and embodiment (no hardware
-connection, no server call — only their declared ``.info``), runs RoboLens's
+connection, no server call — only their declared ``.info``), runs RoboInspect's
 compatibility check, prints the report, and exits non-zero on any error. Pass
 ``--task kitchenbench/pour_pasta`` to also verify every scene is realizable.
 
@@ -17,9 +17,9 @@ import argparse
 import json
 from collections.abc import Callable
 
-from robolens.compat import CompatibilityReport, check_compatibility
-from robolens.registry import resolve
-from robolens.task import Task
+from roboinspect.compat import CompatibilityReport, check_compatibility
+from roboinspect.registry import resolve
+from roboinspect.task import Task
 
 from robolens_yam.config import MolmoActConfig, YamConfig
 from robolens_yam.embodiment import YAMEmbodiment

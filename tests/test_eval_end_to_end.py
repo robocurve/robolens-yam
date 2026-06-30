@@ -5,7 +5,7 @@ wiring and chunk replay compose (the static compat test cannot show this)."""
 from __future__ import annotations
 
 import numpy as np
-from robolens import eval as rl_eval
+from roboinspect import eval as rl_eval
 
 from robolens_yam.config import MolmoActConfig, YamConfig
 from robolens_yam.embodiment import YAMEmbodiment

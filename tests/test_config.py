@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
-from robolens.spaces import CameraSpec
+from roboinspect.spaces import CameraSpec
 
 from robolens_yam.config import (
     DEFAULT_CAMERAS,

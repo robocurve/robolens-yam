@@ -3,8 +3,8 @@
 MolmoAct2 runs as a separate FastAPI process (it owns the GPU + weights). This
 policy is a stateless client: each :meth:`act` packs the three cameras, the
 language instruction, and the packed 14-D ``state`` into the ``/act`` request,
-POSTs it, and turns the returned ``(num_steps, 14)`` array into a RoboLens
-:class:`~robolens.types.ActionChunk`.
+POSTs it, and turns the returned ``(num_steps, 14)`` array into a RoboInspect
+:class:`~roboinspect.types.ActionChunk`.
 
 The HTTP transport is injected (``post_fn``) so the whole policy is testable with
 no server and no network; the real transport (`requests` + `json_numpy`) is a
@@ -18,9 +18,9 @@ from collections.abc import Callable, Mapping
 from typing import Any
 
 import numpy as np
-from robolens.policy import PolicyConfig, PolicyInfo
-from robolens.scene import Scene
-from robolens.types import Action, ActionChunk, Observation
+from roboinspect.policy import PolicyConfig, PolicyInfo
+from roboinspect.scene import Scene
+from roboinspect.types import Action, ActionChunk, Observation
 
 from robolens_yam import packing
 from robolens_yam.config import MolmoActConfig, action_box, observation_space
@@ -42,7 +42,7 @@ def _default_post(  # pragma: no cover - real network transport, only vs a live 
 
 
 class MolmoAct2Policy:
-    """RoboLens policy wrapping MolmoAct2's bimanual-YAM ``/act`` endpoint."""
+    """RoboInspect policy wrapping MolmoAct2's bimanual-YAM ``/act`` endpoint."""
 
     def __init__(
         self,

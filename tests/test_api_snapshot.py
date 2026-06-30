@@ -29,12 +29,12 @@ def test_all_names_are_importable() -> None:
 
 
 def test_version() -> None:
-    assert robolens_yam.__version__ == "0.1.0"
+    assert robolens_yam.__version__ == "0.2.0"
 
 
 def test_entry_points_resolve_via_registry() -> None:
     # The installed entry points must resolve to our classes.
-    from robolens.registry import resolve
+    from roboinspect.registry import resolve
 
     pol = resolve("policy", "molmoact2")
     emb = resolve("embodiment", "yam_arms")

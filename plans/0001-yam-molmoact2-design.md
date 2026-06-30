@@ -1,7 +1,7 @@
 # 0001 — `robolens-yam`: YAM arms + MolmoAct2 adapters
 
 **Status:** design + implementation plan (rev 2 — addresses critique round 1)
-**Goal:** make RoboLens + KitchenBench runnable on **I2RT YAM bimanual arms** driven by
+**Goal:** make RoboInspect + KitchenBench runnable on **I2RT YAM bimanual arms** driven by
 **MolmoAct2**, with `(policy, embodiment)` compatibility guaranteed — and motion made
 *safe* — *before any arm moves*.
 
@@ -9,7 +9,7 @@ The deliverable is a standalone plugin package `robolens-yam` →
 `github.com/robocurve/robolens-yam`, registered via entry points so:
 
 ```bash
-robolens run --task kitchenbench/pour_pasta --policy molmoact2 --embodiment yam_arms
+roboinspect run --task kitchenbench/pour_pasta --policy molmoact2 --embodiment yam_arms
 ```
 
 resolves the two new components and runs the closed-loop rollout, scored by
@@ -34,7 +34,7 @@ FastAPI server exposing `/act` over a `json_numpy`-encoded wire protocol.
 Commanded via i2rt (`get_yam_robot(channel, gripper_type)`,
 `robot.command_joint_pos(target)`, `robot.get_joint_pos()`) → **joint-position** control.
 
-**Resulting RoboLens spaces (identical on both sides → zero remap, zero compat errors):**
+**Resulting RoboInspect spaces (identical on both sides → zero remap, zero compat errors):**
 
 | field | value |
 |---|---|
@@ -65,7 +65,7 @@ on a laptop with no hardware and no server.
 
 ```
 robolens-yam/
-  pyproject.toml          # name=robolens-yam; robolens+kitchenbench via tool.uv.sources tags
+  pyproject.toml          # name=robolens-yam; roboinspect+kitchenbench via tool.uv.sources tags
   README.md               # install, launch the MolmoAct2 server, run, preflight, safety, risks
   CLAUDE.md  +  src/robolens_yam/CLAUDE.md
   LICENSE                 # MIT  (done)
@@ -110,7 +110,7 @@ robolens-yam/
   `cam_height=224`, `cam_width=224`.
 - Both have classmethod `from_kwargs(**flat)` so the constructors accept **flat
   scalar kwargs** (`server_url=`, `num_steps=`, `left_channel=`, `control_hz=`, …)
-  — required so `robolens run -P server_url=... -E left_channel=...` works (the CLI
+  — required so `roboinspect run -P server_url=... -E left_channel=...` works (the CLI
   only passes scalars; see §6).
 
 ### 2.3 `operator.py`
@@ -225,12 +225,12 @@ success → assert `task_success == True` and an `EvalLog` with `status="success
 This proves the `termination_reason="success"` → scorer wiring and chunk replay
 actually compose (the static compat test cannot).
 
-This pair of tests is what *closes the goal*: robolens + kitchenbench are provably
+This pair of tests is what *closes the goal*: roboinspect + kitchenbench are provably
 compatible with — and actually score a rollout on — YAM + MolmoAct2.
 
 ---
 
-## 4. Risks RoboLens cannot catch (correctness/safety, not shape) — surfaced
+## 4. Risks RoboInspect cannot catch (correctness/safety, not shape) — surfaced
 
 1. **Absolute vs. delta joints.** `ControlMode` has **no `joint_delta` literal**, so
    compat *cannot* represent the delta case — green preflight does **not** prove
@@ -257,7 +257,7 @@ compatible with — and actually score a rollout on — YAM + MolmoAct2.
 
 ---
 
-## 5. Quality gates (mirror robolens/kitchenbench)
+## 5. Quality gates (mirror roboinspect/kitchenbench)
 
 - `ruff check .`, `ruff format --check .`, `mypy --strict` on `src/robolens_yam`.
 - `pytest --cov` at **100% branch** (`fail_under=100`). Uncoverable hardware/TTY
@@ -269,14 +269,14 @@ compatible with — and actually score a rollout on — YAM + MolmoAct2.
 - Static version `0.1.0`. Public API fenced by `robolens_yam.__all__`.
 - **Dependencies (addresses Blocker #9):**
   ```toml
-  dependencies = ["robolens>=0.1", "numpy>=1.24"]
+  dependencies = ["roboinspect>=0.1", "numpy>=1.24"]
   [project.optional-dependencies]
   client = ["requests>=2.31", "json-numpy>=2.1"]   # real /act transport
   yam    = ["i2rt"]                                 # real arm driver
   dev    = ["pytest>=8", "pytest-cov>=5", "ruff>=0.6", "mypy>=1.11",
             "pre-commit>=3.5", "kitchenbench"]      # kitchenbench needed by compat test
   [tool.uv.sources]
-  robolens     = { git = "https://github.com/robocurve/robolens",     tag = "v0.1.0" }
+  roboinspect     = { git = "https://github.com/robocurve/roboinspect",     tag = "v0.1.0" }
   kitchenbench = { git = "https://github.com/robocurve/kitchenbench", tag = "v0.1.0" }
   ```
   (Tag `kitchenbench` v0.1.0 first if it isn't tagged; else use `branch="main"`.)
@@ -285,17 +285,17 @@ compatible with — and actually score a rollout on — YAM + MolmoAct2.
 ## 6. Entry points & CLI knobs
 
 ```toml
-[project.entry-points."robolens.embodiments"]
+[project.entry-points."roboinspect.embodiments"]
 yam_arms = "robolens_yam.embodiment:YAMEmbodiment"
-[project.entry-points."robolens.policies"]
+[project.entry-points."roboinspect.policies"]
 molmoact2 = "robolens_yam.policy:MolmoAct2Policy"
 [project.scripts]
 robolens-yam-preflight = "robolens_yam.preflight:main"
 ```
-Registry resolves with `factories[name](**kwargs)` and `robolens run` (no `-E/-P`)
+Registry resolves with `factories[name](**kwargs)` and `roboinspect run` (no `-E/-P`)
 passes `kwargs={}` → **both classes must be zero-arg constructible** (defaults
 build configs; nothing connects). `**flat` scalar kwargs let
-`robolens run -P server_url=http://host:8202 -E left_channel=can0` work despite the
+`roboinspect run -P server_url=http://host:8202 -E left_channel=can0` work despite the
 CLI only producing scalars (addresses #13). A test constructs `YAMEmbodiment()` and
 `MolmoAct2Policy()` with nothing mocked and asserts `.info`/`.config`.
 

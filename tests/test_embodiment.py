@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
-from robolens.embodiment import SELF_PACED
-from robolens.scene import Scene
-from robolens.types import Action
+from roboinspect.embodiment import SELF_PACED
+from roboinspect.scene import Scene
+from roboinspect.types import Action
 
 from robolens_yam.config import YamConfig
 from robolens_yam.embodiment import YAMEmbodiment
